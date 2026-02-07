@@ -10,7 +10,7 @@ class ClaimModel:
         self.policy_limit = policy_limit
 
     def calculate_compensation(self):
-        """Logic คำนวณสำหรับคนทั่วไป (General)
+        """Logic คำนวณสำหรับคนทั่วไป
         รายได้ 6500 - 50000 ได้ตามรายได้จริง แต่ไม่เกิน 20,000"""
         return min(self.income, self.policy_limit)
 
