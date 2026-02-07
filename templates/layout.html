@@ -28,11 +28,20 @@
     </style>
   </head>
   <body>
-    <nav class="navbar navbar-dark bg-primary">
-      <div class="container-fluid justify-content-center">
-        <span class="navbar-brand mb-0 h1"
-          >🏛️ ระบบคำนวณเงินเยียวยาของรัฐ (MVC Exam)</span
-        >
+    <nav class="navbar navbar-dark bg-primary mb-4">
+      <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">🏛️ ระบบคำนวณเงินเยียวยาของรัฐ</span>
+
+        {% if session.get('user') %}
+        <div class="d-flex align_items-center">
+          <span class="text-white me-3">
+            ผู้ใช้: {{ session['user'] }} ({{ session['role'] }})
+          </span>
+          <a href="/logout" class="btn btn-sm btn-light text-primary"
+            >ออกจากระบบ</a
+          >
+        </div>
+        {% endif %}
       </div>
     </nav>
 

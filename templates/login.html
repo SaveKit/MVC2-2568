@@ -1,0 +1,49 @@
+{% extends "layout.html" %} {% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-5">
+    <div class="card shadow">
+      <div class="card-header bg-primary text-white text-center">
+        <h4>🔐 เข้าสู่ระบบ (Login)</h4>
+      </div>
+      <div class="card-body p-4">
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %} {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %} {% endif %} {% endwith %}
+
+        <form action="/login" method="POST">
+          <div class="mb-3">
+            <label class="form-label">ชื่อผู้ใช้ (Username)</label>
+            <input
+              type="text"
+              name="username"
+              class="form-control"
+              placeholder="admin หรือ user"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">รหัสผ่าน (Password)</label>
+            <input
+              type="password"
+              name="password"
+              class="form-control"
+              placeholder="1234"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary w-100">
+            เข้าสู่ระบบ
+          </button>
+        </form>
+        <div class="mt-3 text-center text-muted">
+          <small
+            >Officer: admin / 1234 <br />
+            Citizen: user / 1234</small
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

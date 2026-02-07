@@ -1,5 +1,5 @@
 # controllers/web_controller.py
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 import sqlite3
 import random
 from datetime import datetime
@@ -17,8 +17,54 @@ def get_db_connection():
     return conn
 
 
+@web_bp.route("/login", methods=["GET", "POST"])
+def login():
+    """จัดการการเข้าสู่ระบบ"""
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        conn = get_db_connection()
+        user = conn.execute(
+            "SELECT * FROM users WHERE username = ?", (username,)
+        ).fetchone()
+        conn.close()
+
+        if user and user["password"] == password:
+            session["user"] = user["username"]
+            session["role"] = user["role"]
+
+            # แยกทางเดิน
+            # Officer -> หน้า List
+            # Citizen -> หน้า Form
+            if user["role"] == "officer":
+                return redirect(url_for("web.index"))
+            else:
+                return redirect(url_for("web.create_form"))
+        else:
+            flash("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง", "danger")
+
+    return render_template("login.html")
+
+
+@web_bp.route("/logout")
+def logout():
+    """ออกจากระบบ"""
+    session.clear()
+    return redirect(url_for("web.login"))
+
+
 @web_bp.route("/")
 def index():
+    # ถ้ายังไม่ login ให้ไปหน้า login
+    if "user" not in session:
+        return redirect(url_for("web.login"))
+
+    # ถ้าไม่ใช่ officer ห้ามดูหน้านี้
+    if session["role"] != "officer":
+        flash("คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (สำหรับเจ้าหน้าที่เท่านั้น)", "warning")
+        return redirect(url_for("web.create_form"))
+
     """Action: แสดงหน้าหลัก (List View)"""
     conn = get_db_connection()
     # Query ข้อมูลมาแสดง
@@ -39,6 +85,10 @@ def index():
 
 @web_bp.route("/create")
 def create_form():
+    # ถ้ายังไม่ login ให้ไปหน้า login
+    if "user" not in session:
+        return redirect(url_for("web.login"))
+
     """Action: แสดงหน้าฟอร์ม (Form View)"""
     return render_template("form.html")
 

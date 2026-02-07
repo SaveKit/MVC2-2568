@@ -63,6 +63,21 @@ def setup_database():
     """
     )
 
+    # 5. ตาราง Users (สำหรับ Login)
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS users (
+            username TEXT PRIMARY KEY,
+            password TEXT NOT NULL,
+            role TEXT NOT NULL
+        )
+    """
+    )
+
+    # ข้อมูล User จำลอง
+    cursor.execute("INSERT OR IGNORE INTO users VALUES ('admin', '1234', 'officer')")
+    cursor.execute("INSERT OR IGNORE INTO users VALUES ('user', '1234', 'citizen')")
+
     conn.commit()
     conn.close()
     print("Database setup complete.")
