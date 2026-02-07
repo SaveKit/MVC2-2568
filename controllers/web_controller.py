@@ -156,4 +156,9 @@ def submit_claim():
     flash(msg, "success")
 
     # 5. กลับไปหน้ารายการคำขอ
-    return redirect(url_for("web.index"))
+    if session.get("role") == "officer":
+        # ถ้าเป็นเจ้าหน้าที่ -> ไปหน้ารายการคำขอ
+        return redirect(url_for("web.index"))
+    else:
+        # ถ้าเป็นประชาชน -> กลับมาหน้าเดิม
+        return redirect(url_for("web.create_form"))
