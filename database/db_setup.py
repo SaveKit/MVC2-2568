@@ -37,6 +37,23 @@ def setup_database():
     """
     )
 
+    # ข้อมูล Policies (กฎเกณฑ์)
+    # P01: รายได้น้อย (Fixed 6500)
+    # P02: ทั่วไป (Max 20000)
+    # P03: รายได้สูง (Max 20000)
+    cursor.execute(
+        "INSERT OR IGNORE INTO policies (policy_id, max_amount, income_condition) VALUES (?, ?, ?)",
+        ("P01", 6500, "Income < 6500"),
+    )
+    cursor.execute(
+        "INSERT OR IGNORE INTO policies (policy_id, max_amount, income_condition) VALUES (?, ?, ?)",
+        ("P02", 20000, "6500 <= Income <= 50000"),
+    )
+    cursor.execute(
+        "INSERT OR IGNORE INTO policies (policy_id, max_amount, income_condition) VALUES (?, ?, ?)",
+        ("P03", 20000, "Income > 50000"),
+    )
+
     # 3. ตาราง Claims (คำขอเยียวยา)
     cursor.execute(
         """

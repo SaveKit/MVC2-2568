@@ -95,45 +95,54 @@ def create_form():
 
 @web_bp.route("/submit", methods=["POST"])
 def submit_claim():
-    """Action: รับค่าจากฟอร์ม -> คำนวณ (Model) -> บันทึก -> กลับหน้าหลัก"""
-    # 1. รับค่าจาก View
+    # 1. รับค่า
     first_name = request.form["first_name"]
     last_name = request.form["last_name"]
     income = float(request.form["income"])
 
-    # 2. เรียกใช้ Model เพื่อคำนวณ (Business Logic)
-    model = get_claim_model(income)
-    compensation_amount = model.calculate_compensation()
-
-    # Determine Type
-    c_type = "General"
-    if income < 6500:
-        c_type = "LowIncome"
-    elif income > 50000:
-        c_type = "HighIncome"
-
-    # 3. บันทึกลง Database
+    # 2. เชื่อม DB เพื่อดึง Policy
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Insert Claimant
+    # Determine Type & Fetch Policy (ดึงค่า Max Amount จากตาราง policies)
+    policy_id = ""
+    c_type = ""
+
+    if income < 6500:
+        c_type = "LowIncome"
+        policy_id = "P01"
+    elif income > 50000:
+        c_type = "HighIncome"
+        policy_id = "P03"
+    else:
+        c_type = "General"
+        policy_id = "P02"
+
+    # ดึงข้อมูล Policy จาก DB
+    policy_row = cursor.execute(
+        "SELECT max_amount FROM policies WHERE policy_id = ?", (policy_id,)
+    ).fetchone()
+    policy_limit = policy_row["max_amount"]
+
+    # 3. ส่งค่า Income และ Policy Limit ไปให้ Model คำนวณ
+    model = get_claim_model(income, policy_limit)
+    compensation_amount = model.calculate_compensation()
+
+    # 4. บันทึกลง Database (เหมือนเดิม)
     cursor.execute(
         "INSERT INTO claimants (first_name, last_name, income, claimant_type) VALUES (?, ?, ?, ?)",
         (first_name, last_name, income, c_type),
     )
     claimant_id = cursor.lastrowid
 
-    # Generate IDs & Date
     claim_id = str(random.randint(10000000, 99999999))
     current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # Insert Claim
     cursor.execute(
         "INSERT INTO claims (claim_id, claimant_id, request_date, status) VALUES (?, ?, ?, ?)",
         (claim_id, claimant_id, current_date, "Approved"),
     )
 
-    # Insert Compensation
     cursor.execute(
         "INSERT INTO compensations (claim_id, amount, calc_date) VALUES (?, ?, ?)",
         (claim_id, compensation_amount, current_date),
@@ -142,5 +151,9 @@ def submit_claim():
     conn.commit()
     conn.close()
 
-    # 4. ส่งผลลัพธ์กลับไปหน้าหลัก (Redirect)
+    # ส่งข้อความแจ้งเตือน (Flash Message) พร้อมยอดเงิน ไปแสดงที่หน้าถัดไป
+    msg = f"✅ บันทึกคำขอสำเร็จ! คุณได้รับเงินเยียวยาจำนวน {compensation_amount:,.2f} บาท"
+    flash(msg, "success")
+
+    # 5. กลับไปหน้ารายการคำขอ
     return redirect(url_for("web.index"))
