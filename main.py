@@ -1,7 +1,8 @@
 # main.py
 from flask import Flask
 from database.db_setup import setup_database
-from controllers.web_controller import web_bp
+from controllers.auth_controller import auth_bp
+from controllers.claim_controller import claim_bp
 
 
 def create_app():
@@ -12,7 +13,8 @@ def create_app():
     app.secret_key = "exam_secret_key_123"
 
     # ลงทะเบียน Controller (Blueprint)
-    app.register_blueprint(web_bp)
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(claim_bp)
 
     return app
 
