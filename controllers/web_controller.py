@@ -70,7 +70,8 @@ def index():
     # Query ข้อมูลมาแสดง
     sql = """
         SELECT c.claim_id, cl.first_name || ' ' || cl.last_name as full_name, 
-               cl.income, c.status, comp.amount
+               cl.income, c.status, comp.amount,
+               c.request_date, comp.calc_date
         FROM claims c
         JOIN claimants cl ON c.claimant_id = cl.id
         JOIN compensations comp ON c.claim_id = comp.claim_id
