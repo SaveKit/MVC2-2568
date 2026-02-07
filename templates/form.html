@@ -1,0 +1,48 @@
+{% extends "base.html" %} {% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h4 class="mb-0">📝 แบบฟอร์มยื่นคำขอรับเงินเยียวยา</h4>
+      </div>
+      <div class="card-body">
+        <form action="/submit" method="POST">
+          <div class="mb-3">
+            <label class="form-label">ชื่อจริง</label>
+            <input
+              type="text"
+              name="first_name"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">นามสกุล</label>
+            <input type="text" name="last_name" class="form-control" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">รายได้ต่อเดือน (บาท)</label>
+            <input
+              type="number"
+              step="0.01"
+              name="income"
+              class="form-control"
+              required
+            />
+            <div class="form-text">
+              ระบบจะคำนวณเงินเยียวยาอัตโนมัติตามเงื่อนไขรายได้
+            </div>
+          </div>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+            <a href="/" class="btn btn-secondary me-2">ยกเลิก</a>
+            <button type="submit" class="btn btn-primary px-4">
+              คำนวณและบันทึก
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

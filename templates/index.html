@@ -1,0 +1,35 @@
+{% extends "base.html" %} {% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h3>📋 รายการคำขอเยียวยา</h3>
+  <a href="/create" class="btn btn-success">+ ยื่นคำขอใหม่</a>
+</div>
+
+<div class="card p-3">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>รหัสคำขอ</th>
+        <th>ชื่อผู้ขอ</th>
+        <th>รายได้ (บาท)</th>
+        <th>สถานะ</th>
+        <th>เงินเยียวยา (บาท)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in claims %}
+      <tr>
+        <td>{{ row[0] }}</td>
+        <td>{{ row[1] }}</td>
+        <td>{{ "{:,.2f}".format(row[2]) }}</td>
+        <td><span class="badge bg-success">{{ row[3] }}</span></td>
+        <td class="fw-bold text-primary">{{ "{:,.2f}".format(row[4]) }}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="5" class="text-center text-muted">ยังไม่มีข้อมูลคำขอ</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
